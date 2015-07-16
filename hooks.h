@@ -13,7 +13,7 @@ bool BHOP(CUserCmd* cmd)
 	if (cmd->buttons & IN_JUMP && !(me->GetFlags() & FL_ONGROUND))
 		cmd->buttons &= ~IN_JUMP;
 	
-	return false;
+	return true;
 }
 bool runonce = false;
 void __stdcall hkCreateMove(int sequence_number,
