@@ -13,8 +13,9 @@ bool BHOP(CUserCmd* cmd)
 	if (cmd->buttons & IN_JUMP && !(me->GetFlags() & FL_ONGROUND))
 		cmd->buttons &= ~IN_JUMP;
 	
-	return true;
+	return false;
 }
+bool runonce = false;
 void __stdcall hkCreateMove(int sequence_number,
 	float input_sample_frametime,
 	bool active)
@@ -22,19 +23,19 @@ void __stdcall hkCreateMove(int sequence_number,
 	oCreateMove(sequence_number, input_sample_frametime, active);
 	CUserCmd* cmdlist = *(CUserCmd**)((DWORD)Interfaces.Input + 0xEC);
 	CUserCmd* cmd = &cmdlist[sequence_number % 150];
-	//Add hooks here
-	HookAdd(BHOP);
-
-
-	//Stop here
+	if (!runonce)
+	{
+		HookAdd(BHOP);
+		//Add hooks here
+		runonce = true;
+	}
 	for (unsigned int i = 0; i < hook.size(); i++)
 	{
 		if ((*hook[i])(cmd) == false)
 		{
-			printf("A plugin failed! Number %i\n", i);
+			printf("A plugin failed! Index %i\n", i);
 		}
 	}
-
 	CVerifiedUserCmd* verifiedlist = *(CVerifiedUserCmd**)((DWORD)Interfaces.Input + 0xF0);
 	CVerifiedUserCmd* verified = &verifiedlist[sequence_number % 150];
 	verified->m_cmd = *cmd;
